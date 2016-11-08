@@ -26,5 +26,5 @@
     "split": "^1.0.0",
     "twitter": "^1.4.0"
   },
-  "engine": "node 6.5.0"
+  "engine": "node >= 6.5.0"
 }
