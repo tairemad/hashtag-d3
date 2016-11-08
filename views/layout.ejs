@@ -1,0 +1,123 @@
+<!DOCTYPE html>
+<html xmlns="http://www.w3.org/1999/html">
+<head>
+    <title>What's Your Hashtag?</title>
+    <link href="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.7/css/bootstrap.min.css" rel="stylesheet" integrity="sha384-BVYiiSIFeK1dGmJRAkycuHAHRg32OmUcww7on3RYdg4Va+PmSTsz/K68vbdEjh4u" crossorigin="anonymous">
+    <link rel='stylesheet' href='/stylesheets/style.css' />
+    <link rel='stylesheet' href='/stylesheets/animate.css' />
+    <script src="http://d3js.org/d3.v3.min.js"></script>
+    <script src="/javascripts/d3.layout.cloud.js"></script>
+</head>
+<body>
+<div class="container-fluid">
+    <div class="row headerSection">
+        <img src="/images/Twitter-bird-clipart.jpg" width="150" height="150">
+        <div class="col-md-offset-2 col-md-8">
+            <h1 class="pHeader">What's Your <span>#HashTag</span>?</h1>
+            <form action="/" method="post">
+                <div class="form-group">
+                    <input type="text" id="hashtag" placeholder="Search hashtag" name="hashtag" class="form-control sForm">
+                </div>
+                <span class="input-group-btn">
+                <button class="btn btn-ghost" id="searchHash" type="submit">Search</button>
+                </span>
+            </form>
+        </div>
+    </div>
+    <div class="row">
+        <div class="col-md-12 showTweets">
+            <div id="cloud">
+                <script>
+                    (function(){
+                        var text = "<%= tweets %>",
+                                width = 1100,
+                                height = 700,
+                                rotate_words = true;
+
+                        var wordmap = processText(text);
+
+                        var svg = d3.select('#cloud').html('').append('svg');
+
+                        drawCloud(wordmap, width, height, svg, rotate_words);
+
+                    })();
+
+                    function processText(text){
+                        var unique_word_counts = {},
+                                exclude_words = 'me, you, he, she, her, him, it, &#34';
+                        var tokenized_text = text.split(/[ '\-\(\)\*":;\[\]|{},.!?]+/);
+                        tokenized_text.forEach(function(raw_word){
+                            var word = raw_word.toLowerCase();
+                            if (word != "" && exclude_words.indexOf(word)==-1 && word.length>1){
+                                word in unique_word_counts ?
+                                        unique_word_counts[word]++ :
+                                        (unique_word_counts[word] = 1 + Math.random());
+                            }
+                        });
+
+                        var wordmap = d3.entries(unique_word_counts).sort(function(a,b){
+                            return b.value - a.value;
+                        });
+
+                        return wordmap;
+                    }
+
+                    function drawCloud(wordmap, width, height, svg, rotate_words){
+                        var cloud = d3.layout.cloud;
+                        var max = Math.min(width / 5, height / 5, 100),
+                                font_size = d3.scale.linear()
+                                        .domain([ 1, d3.max( wordmap, function(d) { return d.value; })])
+                                        .range([max / 10, max]),
+                                fill = d3.scale.category20();
+
+                        cloud().size([width, height])
+                                .words(wordmap)
+                                .timeInterval(20)
+                                .padding(2)
+                                .spiral("archimedean")
+                                .fontSize(function(d) { return font_size(d.value); })
+                                .font("Impact")
+                                .text(function(d) { return d.key; })
+                                .rotate(function() {
+                                    return rotate_words ? (~~(Math.random() * 2) * 90) : 0;
+                                })
+                                .on("end", function(words){
+
+                                    cloud().stop();
+                                    svg
+                                            .attr("width", width)
+                                            .attr("height", height)
+                                            .append("g")
+                                            .attr("transform", "translate(" + [width >> 1, height >> 1] + ")")
+                                            .selectAll("text")
+                                            .data(words)
+                                            .enter().append("text")
+                                            .style("font-family", "Impact")
+                                            .style("font-size", function(d) { return font_size(d.value) + "px"; })
+                                            .style("fill", function(d, i) { return fill(i); })
+                                            .attr("text-anchor", "middle")
+                                            .attr("transform", function(d) {
+                                                return "translate(" + [d.x, d.y] + ")rotate(" + d.rotate + ")";
+                                            })
+                                            .text(function(d) { return d.key; });
+                                })
+                                .start();
+                    }
+                </script>
+            </div>
+
+            </div>
+            <div class="col-md-12">
+            <footer>
+                <p class="text-center">
+                    Made with ❤ by <a href="http://tairemadailey.com">Tairema Dailey</a>
+                </p>
+            </footer>
+            </div>
+    </div>
+</div>
+
+<script src="https://ajax.googleapis.com/ajax/libs/jquery/2.2.4/jquery.min.js"></script>
+<script src="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.7/js/bootstrap.min.js" integrity="sha384-Tc5IQib027qvyjSMfHjOMaLkfuWVxZxUPnCJA7l2mCWNIpG9mGCD8wGNIcPD7Txa" crossorigin="anonymous"></script>
+</body>
+</html>
