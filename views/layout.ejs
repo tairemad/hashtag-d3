@@ -68,7 +68,7 @@
                                 font_size = d3.scaleLinear()
                                         .domain([ 1, d3.max( wordmap, function(d) { return d.value; })])
                                         .range([max / 10, max]),
-                                fill = d3.schemeCategory20();
+                                fill = d3.scaleOrdinal(d3.schemeCategory20);
 
                         cloud().size([width, height])
                                 .words(wordmap)
