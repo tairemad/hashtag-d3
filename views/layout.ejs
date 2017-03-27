@@ -65,7 +65,7 @@
                     function drawCloud(wordmap, width, height, svg, rotate_words){
                         var cloud = d3.layout.cloud;
                         var max = Math.min(width / 5, height / 5, 100),
-                                font_size = d3.scale.linear()
+                                font_size = d3.scaleLinear()
                                         .domain([ 1, d3.max( wordmap, function(d) { return d.value; })])
                                         .range([max / 10, max]),
                                 fill = d3.scale.category20();
